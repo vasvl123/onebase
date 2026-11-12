@@ -1753,6 +1753,8 @@ body{font-family:system-ui,sans-serif;display:flex;flex-direction:column;height:
 .sys-group-body{padding:2px 0 5px;background:var(--ob-surface-2)}
 .sys-group-body>a{display:block;padding:8px 16px 8px 34px;color:var(--ob-text-2);text-decoration:none;font-size:13px;border-top:1px solid var(--ob-surface-3)}
 .sys-group-body>a:hover{background:var(--ob-hover-blue);color:var(--ob-link-2)}
+.sys-shutdown{display:block;width:100%;padding:8px 16px 8px 34px;text-align:left;background:none;border:none;border-top:1px solid var(--ob-surface-3);color:var(--ob-danger-ink);text-decoration:none;font-size:13px;cursor:pointer}
+.sys-shutdown:hover{background:var(--ob-danger-hi)}
 .sys-mode-block{padding:9px 16px 10px 34px;border-top:1px solid var(--ob-surface-3)}
 .sys-mode-title{font-size:12px;color:var(--ob-text-3);margin-bottom:6px;font-weight:600}
 .sys-mode-block label,.sys-theme-block label{display:block;font-size:13px;padding:2px 0;cursor:pointer;color:var(--ob-text-2)}
@@ -2039,6 +2041,9 @@ const tplNav = `
           <a href="/ui/admin/audit">{{t $.Lang "Журнал изменений"}}</a>
           {{if .HasStages}}<a href="/ui/stages">{{t $.Lang "Этапы — где застряло"}}</a>{{end}}
           <a href="/ui/admin/rls">{{t $.Lang "Диагностика RLS"}}</a>
+          <form method="post" action="/ui/admin/shutdown" data-ob-confirm="{{t $.Lang "Выключить сервер? Задания и подключения получат время завершиться."}}" style="margin:0;padding:0">
+            <button class="sys-shutdown" type="submit">{{t $.Lang "Выключить сервер"}}</button>
+          </form>
         </div>
       </details>
       <details class="sys-group">
