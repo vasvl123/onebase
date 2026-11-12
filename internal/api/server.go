@@ -49,6 +49,11 @@ func New(reg *runtime.Registry, store *storage.DB, interp *interpreter.Interpret
 	baseID := os.Getenv("ONEBASE_BASE_ID")
 	processDone := make(chan struct{})
 	var processStopOnce sync.Once
+	// stopServer begins the same graceful shutdown as SIGTERM and the
+	// authenticated launcher stop by closing Done exactly once. The frontend
+	// invokes it from the administrator-only "Завершить" command.
+	stopServer := func() { processStopOnce.Do(func() { close(processDone) }) }
+	frontend.SetShutdownRequest(stopServer)
 	processInstance, processInstanceErr := processcontrol.NewNonce()
 	// Единый лимитер попыток входа: форма /login и basic-auth HTTP-сервисов
 	// троттлятся вместе, чтобы брутфорс нельзя было размазать по двум каналам.

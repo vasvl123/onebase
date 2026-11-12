@@ -17,7 +17,7 @@ import (
 	"github.com/ivantit66/onebase/internal/storage"
 )
 
-var adminTmpl = template.Must(template.New("admin").Parse(tplAdminUsers + tplAdminUserCard + tplAdminUserForm + tplAdminPasswd + tplAdminSessions + tplAdminAPITokens + tplAdminCleanup + tplAdminRoles + tplAdminUserRoles + tplAdminAudit + tplAdminWebhooks + tplAdminRLS + tplAdminAuth + tplAdminAuthProvider + tplProfile2FA))
+var adminTmpl = template.Must(template.New("admin").Parse(tplAdminUsers + tplAdminUserCard + tplAdminUserForm + tplAdminPasswd + tplAdminShutdown + tplAdminSessions + tplAdminAPITokens + tplAdminCleanup + tplAdminRoles + tplAdminUserRoles + tplAdminAudit + tplAdminWebhooks + tplAdminRLS + tplAdminAuth + tplAdminAuthProvider + tplProfile2FA))
 
 const tplAdminUsers = `{{define "admin-users"}}` + adminHead + `
 <main>
@@ -246,6 +246,25 @@ func (s *Server) adminUsers(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	renderAdminTemplate(w, "admin-users", map[string]any{"Users": users})
+}
+
+// adminShutdown штатно завершает процесс базы по команде администратора из
+// меню «Система» → «Администрирование». Страница подтверждения и сама команда
+// заперты администратором (CSRF и гейт на isAdmin). Ответ отдаётся ДО
+// тригжера: http.Server при graceful-остановке дожидается активных запросов,
+// поэтому страница успевает уйти браузеру, а процесс затем останавливается
+// тем же путём, что SIGTERM (задания и SSE получают время завершиться).
+func (s *Server) adminShutdown(w http.ResponseWriter, r *http.Request) {
+	if !s.isAdmin(r) {
+		s.renderForbidden(w, r)
+		return
+	}
+	stopped := s.hasShutdownRequest()
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	renderAdminTemplate(w, "admin-shutdown", map[string]any{"Stopped": stopped})
+	if stopped {
+		s.requestShutdown()
+	}
 }
 
 func (s *Server) adminUserCard(w http.ResponseWriter, r *http.Request) {
@@ -1191,6 +1210,20 @@ const tplAdminPasswd = `{{define "admin-passwd"}}` + adminHead + `
   </form>
 </div>
 {{end}}
+</main></body></html>
+{{end}}`
+
+const tplAdminShutdown = `{{define "admin-shutdown"}}` + adminHead + `
+<main>
+<div class="card" style="max-width:560px">
+{{if .Stopped}}
+  <h2>Сервер завершается</h2>
+  <p style="color:#334155;font-size:14px;margin-top:8px">Запущенные задания, подключения и незавершённые запросы получают время корректно завершиться. Окно можно закрыть — процесс базы остановится сам, база не убивается по номеру порта.</p>
+{{else}}
+  <h2>Завершение не выполнено</h2>
+  <p style="color:#334155;font-size:14px;margin-top:8px">Запуск базы не настроен на завершение из интерфейса. Остановите процесс штатной командой остановки (SIGTERM, закрытие лаунчера).</p>
+{{end}}
+</div>
 </main></body></html>
 {{end}}`
 

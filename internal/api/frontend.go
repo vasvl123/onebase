@@ -50,6 +50,11 @@ type FrontendLifecycle interface {
 	InvalidateServiceCache()
 	ResyncWSIntakes()
 	PublishDevReload()
+	// SetShutdownRequest hands the frontend the closure that begins the
+	// graceful process shutdown (same path as SIGTERM and the authenticated
+	// launcher stop). The frontend is expected to invoke it from an
+	// administrator-only control; closing the Done channel twice is a no-op.
+	SetShutdownRequest(func())
 }
 
 type Frontend interface {

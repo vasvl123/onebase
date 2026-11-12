@@ -125,6 +125,8 @@ type Server struct {
 	exportJobsMu         sync.Mutex
 	exportJobs           *exportJobStore
 	closeOnce            sync.Once
+	shutdownMu           sync.Mutex // защищает shutdownRequest
+	shutdownRequest      func()     // тригжер graceful-остановки процесса, отдан api.Server
 	lifecycleMu          sync.Mutex
 	backgroundCtx        context.Context
 	backgroundCancel     context.CancelFunc
@@ -217,6 +219,40 @@ func (s *Server) CloseEventStreams() {
 	if s != nil && s.hub != nil {
 		s.hub.Close()
 	}
+}
+
+// SetShutdownRequest receives the graceful-shutdown closure from api.Server.
+// The API shell hands it the same trigger it uses for the authenticated
+// launcher stop, so closing Done is idempotent. Servers built without the API
+// shell (tests, offline) keep it nil and the admin command stays inert.
+func (s *Server) SetShutdownRequest(fn func()) {
+	s.shutdownMu.Lock()
+	s.shutdownRequest = fn
+	s.shutdownMu.Unlock()
+}
+
+// requestShutdown invokes the shutdown trigger. It reports whether a trigger
+// was present, so the handler can tell the user that shutdown is not wired.
+func (s *Server) requestShutdown() bool {
+	s.shutdownMu.Lock()
+	fn := s.shutdownRequest
+	s.shutdownMu.Unlock()
+	if fn == nil {
+		return false
+	}
+	fn()
+	return true
+}
+
+// hasShutdownRequest reports whether the API shell handed the server a
+// shutdown trigger, so a wired run can promise graceful stop and an unwired
+// one (offline server, direct test construction) reports the shutdown is not
+// available.
+func (s *Server) hasShutdownRequest() bool {
+	s.shutdownMu.Lock()
+	fn := s.shutdownRequest
+	s.shutdownMu.Unlock()
+	return fn != nil
 }
 
 // BeginShutdown prevents new detached work, cancels running background jobs,
@@ -477,6 +513,8 @@ func (s *Server) Mount(r chi.Router) {
 	r.Get("/ui/admin/users/{id}/passwd", s.adminUserPasswd)
 	r.Post("/ui/admin/users/{id}/passwd", s.adminUserPasswd)
 	r.Post("/ui/admin/users/{id}/deny-passwd", s.adminUserDenyPasswd)
+	// Штатное завершение процесса базы администратором из меню «Система».
+	r.Post("/ui/admin/shutdown", s.adminShutdown)
 
 	// Admin: монитор обмена данными (план 86)
 	r.Get("/ui/admin/exchange", s.exchangeMonitor)
