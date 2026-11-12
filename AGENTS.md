@@ -17,4 +17,4 @@
 ## Проекты в `bases/`
 
 - Проекты в `bases/` (`bases/sppr`, `bases/compsem`) ведутся по методологии СППР, git не используют: рабочие копии `bases/<проект>/base/` gitignore-нуты, записи идут через каркас (headless procrun и REST v2 под ролью).
-- Не создавать git-коммитов, веток и PR для содержимого `bases/`; git-трекер каркаса — ветка `experiment/sppr-design-ledger` (путь `examples/sppr/`), не рабочая копия `bases/`.
+- Не создавать git-коммитов, веток и PR для содержимого `bases/`
