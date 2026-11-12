@@ -206,7 +206,11 @@ type QueueConfig struct {
 
 // AppConfig holds the optional config/app.yaml metadata.
 type AppConfig struct {
-	Name    string `yaml:"name"`
+	Name string `yaml:"name"`
+	// Title — полное название базы для показа в шапке интерфейса вместе с
+	// путём запуска (напр. «Система проектирования программных решений»).
+	// Необязателен: пустой → шапка показывает name.
+	Title   string `yaml:"title,omitempty"`
 	Version string `yaml:"version"`
 	// MinEngineVersion is advisory: it never prevents checking or starting a base.
 	MinEngineVersion string `yaml:"min_engine_version,omitempty"`

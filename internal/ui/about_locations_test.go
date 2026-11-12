@@ -74,10 +74,16 @@ func TestAbout_RegularUserDoesNotSeeServerPaths(t *testing.T) {
 	if !strings.Contains(html, "Файлы") || !strings.Contains(html, "SQLite") {
 		t.Error("обычному пользователю должны быть видны типы хранения")
 	}
-	for _, hidden := range []string{"/srv/private/config", "/srv/private/data.db", "Расположение конфигурации"} {
-		if strings.Contains(html, hidden) {
-			t.Errorf("обычному пользователю раскрыто %q", hidden)
-		}
+	// Полный путь обычному пользователю не показывается (только имя папки
+	// базы в шапке); таблица «О программе» расположения не раскрывает.
+	if strings.Count(html, "/srv/private/config") != 0 {
+		t.Errorf("обычному пользователю раскрыт путь конфигурации: %s", html)
+	}
+	if strings.Contains(html, "Расположение конфигурации") {
+		t.Errorf("обычному пользователю раскрыто %q", "Расположение конфигурации")
+	}
+	if strings.Contains(html, "/srv/private/data.db") {
+		t.Errorf("обычному пользователю раскрыто %q", "/srv/private/data.db")
 	}
 }
 

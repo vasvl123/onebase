@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"html/template"
 	"net/url"
+	"path"
+	"path/filepath"
 	"sort"
 	"strings"
 	"time"
@@ -300,6 +302,8 @@ func templateFuncs(bundle *i18n.Bundle) template.FuncMap {
 		"listFilterPanelFields": listFilterPanelFields,
 		"listFilterChoices":     listFilterChoices,
 		"lower":                 strings.ToLower,
+		"baseDir":               path.Base,
+		"dirName":               filepath.Dir,
 		"infoRegKeyValue":       infoRegKeyValue,
 		"gridLayoutAttr":        gridLayoutAttr,
 		"gridOrderAttr":         gridOrderAttr,
@@ -1729,7 +1733,8 @@ const tplHead = `
    снимается — там страница прокручивается целиком, см. media-запрос ниже. */
 body{font-family:system-ui,sans-serif;display:flex;flex-direction:column;height:100vh;min-height:100vh;overflow:hidden;background:var(--ob-bg)}
 .topbar{background:var(--ob-topbar-bg);color:var(--ob-topbar-text);padding:0 16px;display:flex;align-items:center;height:38px;flex-shrink:0;position:sticky;top:0;z-index:100}
-.topbar-title{font-size:14px;font-weight:600;color:var(--ob-topbar-accent);flex:1}
+.topbar-title{font-size:14px;font-weight:600;color:var(--ob-topbar-accent);flex:1;display:flex;align-items:center;gap:6px;min-width:0}
+.topbar-path{font-size:12px;font-weight:400;color:var(--ob-topbar-text);opacity:.55;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:45vw}
 .sys-menu{position:relative}
 .sys-btn{background:none;border:none;color:var(--ob-nav-text);cursor:pointer;font-size:15px;padding:6px 10px;border-radius:5px;line-height:1}
 .sys-btn:hover{background:var(--ob-nav-hover-bg);color:var(--ob-nav-hover-text)}
@@ -1966,7 +1971,7 @@ const tplNav = `
 {{define "nav"}}
 <header class="topbar">
   <button class="nav-toggle" type="button" aria-label="{{t $.Lang "Меню"}}" title="{{t $.Lang "Меню"}}" aria-controls="ob-nav" aria-expanded="false" data-ob-nav-toggle>&#9776;</button>
-  <a href="/ui/" class="topbar-title" style="text-decoration:none;color:inherit" title="{{if .IsAdmin}}Конфигурация: {{.Cfg.ConfigSource}} · {{.Cfg.ConfigLocation}}{{if .Cfg.DatabaseLocation}} · {{if eq .Cfg.DatabaseType "sqlite"}}SQLite{{else}}PostgreSQL{{end}} · {{.Cfg.DatabaseLocation}}{{end}}{{else}}{{t $.Lang "Главная"}}{{end}}">{{if .Cfg.Logo}}<img src="/ui/logo" alt="" style="height:22px;max-width:90px;vertical-align:middle;margin-right:6px;border-radius:2px">{{end}}⚡ {{if .Cfg.AppName}}{{.Cfg.AppName}}{{else}}onebase{{end}}</a>
+  <a href="/ui/" class="topbar-title" style="text-decoration:none;color:inherit" title="{{if .IsAdmin}}Конфигурация: {{.Cfg.ConfigSource}} · {{.Cfg.ConfigLocation}}{{if .Cfg.DatabaseLocation}} · {{if eq .Cfg.DatabaseType "sqlite"}}SQLite{{else}}PostgreSQL{{end}} · {{.Cfg.DatabaseLocation}}{{end}}{{else}}{{t $.Lang "Главная"}}{{end}}">{{if .Cfg.Logo}}<img src="/ui/logo" alt="" style="height:22px;max-width:90px;vertical-align:middle;margin-right:6px;border-radius:2px">{{end}}{{if .IsAdmin}}{{if .Cfg.ConfigLocation}}<span class="topbar-path">{{baseDir (dirName .Cfg.ConfigLocation)}}</span> ⚡ {{if .Cfg.AppTitle}}{{.Cfg.AppTitle}}{{else if .Cfg.AppName}}{{.Cfg.AppName}}{{else}}onebase{{end}} <span class="topbar-path">{{.Cfg.ConfigLocation}}</span>{{end}}{{else}}{{if .Cfg.ConfigLocation}}<span class="topbar-path">{{baseDir (dirName .Cfg.ConfigLocation)}}</span>{{end}}{{end}}</a>
   <form class="topbar-search" method="get" action="/ui/search" role="search">
     <input type="search" name="q" value="{{.SearchQuery}}" placeholder="{{t $.Lang "Поиск по базе"}}" aria-label="{{t $.Lang "Поиск по базе"}}">
   </form>

@@ -49,7 +49,7 @@ func prepareServerRuntime(ctx context.Context, cmd *cobra.Command, db *storage.D
 		PlatAuthor: version.Author, PlatLicense: version.License,
 	}
 	if appCfg != nil {
-		uiCfg.AppName, uiCfg.AppVersion = appCfg.Name, appCfg.Version
+		uiCfg.AppName, uiCfg.AppTitle, uiCfg.AppVersion = appCfg.Name, appCfg.Title, appCfg.Version
 		uiCfg.AppAuthor, uiCfg.AppCopyright = appCfg.Author, appCfg.Copyright
 		uiCfg.AppLicense, uiCfg.AppSupport, uiCfg.Lang = appCfg.License, appCfg.Support, appCfg.Lang
 		if appCfg.Logo != "" {

@@ -299,7 +299,7 @@ func runDev(cmd *cobra.Command, _ []string) error {
 		Dev: true,
 	}
 	if appCfg != nil {
-		uiCfg.AppName = appCfg.Name
+		uiCfg.AppName, uiCfg.AppTitle = appCfg.Name, appCfg.Title
 		uiCfg.AppVersion = appCfg.Version
 		uiCfg.AppAuthor = appCfg.Author
 		uiCfg.AppCopyright = appCfg.Copyright

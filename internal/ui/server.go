@@ -31,6 +31,7 @@ import (
 // Config holds static info shown in «О программе».
 type Config struct {
 	AppName          string
+	AppTitle         string // полное название базы (app.yaml: title), показывается в шапке
 	AppVersion       string
 	AppAuthor        string // автор конфигурации (app.yaml: author)
 	AppCopyright     string // правообладатель конфигурации (app.yaml: copyright)
