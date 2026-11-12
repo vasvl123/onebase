@@ -2329,7 +2329,7 @@ const tplList = `
 {{template "head" .}}{{template "nav" .}}
 <main class="main-list">
 <div class="row-top">
-  <h2>{{.Entity.DisplayName $.Lang}}</h2>
+  <h2>{{if eq .Entity.Kind "catalog"}}{{t $.Lang "Справочник"}}: {{else if eq .Entity.Kind "document"}}{{t $.Lang "Документ"}}: {{end}}{{.Entity.DisplayName $.Lang}}</h2>
   <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
     {{template "list-refresh" (dict "URL" .RequestURI "Lang" $.Lang)}}
     <div class="view-switch">
@@ -3136,7 +3136,7 @@ const tplReport = `
 {{define "page-report"}}
 {{template "head" .}}{{template "nav" .}}
 <main>
-<h2>{{.Report.DisplayName $.Lang}}</h2>
+<h2>{{t $.Lang "Отчёт"}}: {{.Report.DisplayName $.Lang}}</h2>
 <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
   <a class="btn btn-sm" href="/ui/export-jobs">{{t $.Lang "Мои выгрузки"}}</a>
 </div>
@@ -3486,7 +3486,7 @@ const tplProcessor = `
 {{define "page-processor"}}
 {{template "head" .}}{{template "nav" .}}
 <main>
-<h2>{{.Processor.DisplayName $.Lang}}</h2>
+<h2>{{t $.Lang "Обработка"}}: {{.Processor.DisplayName $.Lang}}</h2>
 {{if .Processor.Params}}
 <div class="card" style="margin-bottom:16px">
 {{/* data-ob-busy: пока идёт запуск, кнопка выключается и говорит, что работа
@@ -3877,7 +3877,7 @@ const tplInfoReg = `
 {{template "head" .}}{{template "nav" .}}
 <main>
 <div class="row-top">
-  <h2>{{.InfoReg.DisplayName $.Lang}}{{if .InfoReg.Periodic}} <span style="font-size:13px;color:var(--ob-text-3);font-weight:400">({{t $.Lang "периодический"}})</span>{{end}}</h2>
+  <h2>{{t $.Lang "Регистр сведений"}}: {{.InfoReg.DisplayName $.Lang}}{{if .InfoReg.Periodic}} <span style="font-size:13px;color:var(--ob-text-3);font-weight:400">({{t $.Lang "периодический"}})</span>{{end}}</h2>
   <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
     {{template "list-refresh" (dict "URL" .RequestURI "Lang" $.Lang)}}
     {{if .CanWrite}}<a class="btn" href="/ui/inforeg/{{lower .InfoReg.Name}}/new">+ {{t $.Lang "Добавить запись"}}</a>{{end}}
@@ -4047,7 +4047,7 @@ const tplJournal = `
 {{template "head" .}}{{template "nav" .}}
 <main>
 <div class="row-top">
-  <h2>{{.Journal.DisplayName $.Lang}}</h2>
+  <h2>{{t $.Lang "Журнал"}}: {{.Journal.DisplayName $.Lang}}</h2>
   <div style="display:flex;align-items:center;gap:12px">
     {{template "list-refresh" (dict "URL" .RequestURI "Lang" $.Lang)}}
     <span style="color:var(--ob-text-4);font-size:13px">{{t $.Lang "Всего:"}} {{.Total}}</span>
